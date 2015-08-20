@@ -1,159 +1,200 @@
-# A Virtual Machine for Ruby on Rails Core Development
-
-## Introduction
-
-**Please note this VM is not designed for Rails application development, only Rails core development.**
-
-This project automates the setup of a development environment for working on Ruby on Rails itself. Use this virtual machine to work on a pull request with everything ready to hack and run the test suites.
-
-## Requirements
-
-* [VirtualBox](https://www.virtualbox.org)
-
-* [Vagrant](http://vagrantup.com)
-
-## How To Build The Virtual Machine
-
-Building the virtual machine is this easy:
-
-    host $ git clone https://github.com/rails/rails-dev-box.git
-    host $ cd rails-dev-box
-    host $ vagrant up
-
-That's it.
-
-After the installation has finished, you can access the virtual machine with
-
-    host $ vagrant ssh
-    Welcome to Ubuntu 14.04.2 LTS (GNU/Linux 3.13.0-55-generic x86_64)
-    ...
-    vagrant@rails-dev-box:~$
-
-Port 3000 in the host computer is forwarded to port 3000 in the virtual machine. Thus, applications running in the virtual machine can be accessed via localhost:3000 in the host computer. Be sure the web server is bound to the IP 0.0.0.0, instead of 127.0.0.1, so it can access all interfaces:
-
-    bin/rails server -b 0.0.0.0
-
-## What's In The Box
-
-* Development tools
-
-* Git
-
-* Ruby 2.2
-
-* Bundler
-
-* SQLite3, MySQL, and Postgres
-
-* Databases and users needed to run the Active Record test suite
-
-* System dependencies for nokogiri, sqlite3, mysql, mysql2, and pg
-
-* Memcached
-
-* Redis
-
-* RabbitMQ
-
-* An ExecJS runtime
-
-## Recommended Workflow
-
-The recommended workflow is
-
-* edit in the host computer and
-
-* test within the virtual machine.
-
-Just clone your Rails fork into the rails-dev-box directory on the host computer:
-
-    host $ ls
-    bootstrap.sh MIT-LICENSE README.md Vagrantfile
-    host $ git clone git@github.com:<your username>/rails.git
-
-Vagrant mounts that directory as _/vagrant_ within the virtual machine:
-
-    vagrant@rails-dev-box:~$ ls /vagrant
-    bootstrap.sh MIT-LICENSE rails README.md Vagrantfile
-
-Install gem dependencies in there:
-
-    vagrant@rails-dev-box:~$ cd /vagrant/rails
-    vagrant@rails-dev-box:/vagrant/rails$ bundle
-
-We are ready to go to edit in the host, and test in the virtual machine.
-
-This workflow is convenient because in the host computer you normally have your editor of choice fine-tuned, Git configured, and SSH keys in place.
-
-## Virtual Machine Management
-
-When done just log out with `^D` and suspend the virtual machine
-
-    host $ vagrant suspend
-
-then, resume to hack again
-
-    host $ vagrant resume
-
-Run
-
-    host $ vagrant halt
-
-to shutdown the virtual machine, and
-
-    host $ vagrant up
-
-to boot it again.
-
-You can find out the state of a virtual machine anytime by invoking
-
-    host $ vagrant status
-
-Finally, to completely wipe the virtual machine from the disk **destroying all its contents**:
-
-    host $ vagrant destroy # DANGER: all is gone
-
-Please check the [Vagrant documentation](http://docs.vagrantup.com/v2/) for more information on Vagrant.
-
-## Faster Rails test suites
-
-The default mechanism for sharing folders is convenient and works out the box in
-all Vagrant versions, but there are a couple of alternatives that are more
-performant.
-
-### rsync
-
-Vagrant 1.5 implements a [sharing mechanism based on rsync](https://www.vagrantup.com/blog/feature-preview-vagrant-1-5-rsync.html)
-that dramatically improves read/write because files are actually stored in the
-guest. Just throw
-
-    config.vm.synced_folder '.', '/vagrant', type: 'rsync'
-
-to the _Vagrantfile_ and either rsync manually with
-
-    vagrant rsync
-
-or run
-
-    vagrant rsync-auto
-
-for automatic syncs. See the post linked above for details.
-
-### NFS
-
-If you're using Mac OS X or Linux you can increase the speed of Rails test suites with Vagrant's NFS synced folders.
-
-With a NFS server installed (already installed on Mac OS X), add the following to the Vagrantfile:
-
-    config.vm.synced_folder '.', '/vagrant', type: 'nfs'
-    config.vm.network 'private_network', ip: '192.168.50.4' # ensure this is available
-
-Then
-
-    host $ vagrant up
-
-Please check the Vagrant documentation on [NFS synced folders](http://docs.vagrantup.com/v2/synced-folders/nfs.html) for more information.
-
-## License
-
-Released under the MIT License, Copyright (c) 2012–<i>ω</i> Xavier Noria.
+Setup a quick virtual machine environment for Ruby on Rails application development. 
+
+## Table of Contents
+ - [Overview](#overview)
+ - [What's Included](#whats-included)
+ - [Prerequisites](#prerequisites)
+ - [Building the Virtual Machine](#building)
+	- [Initial Setup](#initial-setup)
+	- [Usage](#usage)
+		- [Setup VM Inside an Existing Rails Project](#option-1)
+		- [Set up as a Standalone VM](#option-2)
+			-[Create a New Rails Project]($option-2a)
+			-[Run an Existing Rails Project]($option-2b)
+ - [Suggested Workflow](#workflow)
+	- [Virtual Machine Managements](#virtual-machine-management)
+ - [Troubleshooting](#troubleshooting)
+	 - [Port Collision](#port-collision)
+	 - [Box Not Found](#box-not-found)
+	 - [Page Not Found](#page-not-found)
+
+<a name="overview"></a>
+## Overview
+It looks like there's a lot in this readme, but really, the steps are:
+* Clone this repo (5 sec)
+* vagrant up (5 sec)
+* Go read an xkcd comic or two while vagrant initially sets up the VM (2 min)
+* Get your ruby on
+
+<a name="whats-included"></a>
+## What's Included
+* Ubuntu 14.04 Trust Tahr 64-bit 
+* Ruby 2.2.2 
+* Ruby on Rails (through Bundler)
+* SQLite3
+	* MySQL (optional, see bootstrap)
+	* PostgreSQL (optional, see bootstrap)
+* Node.js
+
+<a name="prerequisites"></a>
+## Prerequisites
+* [VirtualBox](https://www.virtualbox.org) - Get the latest version, you no use old versions from package manager repositories!
+* [Vagrant](http://vagrantup.com) - Same as above. Version 1.5.x or later is required for this box to boot 
+* [Git Bash](https://msysgit.github.io/) or [Git Extensions](https://code.google.com/p/gitextensions/) (optional)
+
+Vagrant requires VirtualBox. Git Bash/Extensions is optional, and only needed by Windows users to run the below linux-based commands and interact with the VM
+
+<a name="building"></a>
+## Building the Virtual Machine
+<a href="initial-setup"></a>
+### Initial Setup
+```sh
+$ git clone https://github.com/william-c-martin-iii/rails-app-dev-box.git
+$ cd rails-app-dev-box
+$ vagrant up
+```
+<a name="usage"></a>
+### Usage
+There are two options for setting up the virtual machine. 
+* Inside of an existing rails project
+* Outside as a stand-alone box to create rails projects inside of
+
+<a name="option-1"></a>
+#### Option 1) Setup VM Inside an Existing Rails Project
+Copy the Vagrantfile and bootstrap from this repo to your project directory and boot the VM:
+```sh
+$ cp VagrantFile /path/to/your/existing/rails/project/
+$ cp bootstrap.sh /path/to/your/existing/rails/project/
+$ cd /path/to/your/existing/rails/project
+$ vagrant up
+```
+Login to the box and install dependencies for your rails project:
+```sh
+$ vagrant ssh
+$ cd /vagrant/ 
+$ bundle
+```
+
+Perform any database creation & migrations and start the web server:
+```sh
+$ bundle exec rake db:create db:migrate db:seed
+$ rails server
+```	
+<a name="option-2"></a>
+#### Option 2) Setup as a Standalone VM
+
+Simply boot & provision the machine:
+```sh
+$ vagrant up
+```
+
+Now at this point, you can either create a new rails project, or copy over an existing one.
+
+<a name="option-2a"></a>
+##### Create a New Rails Project
+
+Login to the box & install rails:
+```sh
+$ vagrant ssh
+$ cd /vagrant/
+$ sudo gem install rails
+```
+
+Exit and log back into the box so the rails commands work (You will get rails command not found otherwise):
+```sh
+$ exit
+$ vagrant ssh
+$ cd /vagrant/
+```
+
+And now create a new project and start the web server:
+```sh
+$ rails new yourproject
+$ rails server
+```	
+
+<a name="option-2b"></a>
+##### Run an Existing Rails Project
+
+To setup an existing project, copy in the project directory, and install dependencies for the project, and launch the web server
+```sh
+$ cp /path/to/your/project/ your-project-name
+$ vagrant ssh
+$ cd /vagrant/
+$ bundle
+```
+
+And now perform any database creation & migrations and start the web server:
+```sh
+$ bundle exec rake db:create db:migrate db:seed
+$ rails server
+```	
+
+<a name="#workflow"></a>
+## Suggested Workflow
+* Login to the VM box ($ vagrant ssh)
+* Enter your project's directory ($ /vagrant/your-project-name)
+* Start the rails web server ($ rails server) inside of your project 
+* Edit your project's files on your (host) computer, with your editor of choice, such as Sublime or IDE such as Rubymine
+* Realize that vagrant keeps your changes synced to the /vagrant/your-project-name/ inside the VM
+* Maintain your repository with git on your (host) computer
+* Basically do everything you would normally do on your (host) computer
+* Run your rails app at [http://localhost:3000](localhost:3000) in your local browser on your host machine since your guest (VM) is forwarding port 3000
+* Shut off the VM when you're done as problems can sometimes occur when your host computer shuts off while the VM continues on running
+
+<a name="virtual-machine-management"></a>
+#### Virtual Machine Management
+
+##### To Stop the Web Server & Shutdown the VM
+```sh
+$ (hit ctrl-c to end the web server)
+$ exit
+$ vagrant halt
+```
+
+##### To Resume the Web Server & VM again
+```sh
+$ vagrant up
+$ vagrant ssh
+$ cd /vagrant/your-project-name
+$ rails server
+```
+
+##### To Find Out if VM is Running
+```sh
+$ vagrant status
+```
+
+<a name="#troubleshooting"></a>
+## Troubleshooting
+<a name="#port-collision"></a>
+### Port Collision
+>"Vagrant cannot forward the specified ports on this VM, since they would collide with another VirtualBox virtual machine's forwarded ports! The forwarded port to 4567 is already in use on the host machine."
+
+If you get an error about the host's 3000 port already being taken while doing $ vagrant up, kill all VirtualBox processes first. Sometimes your previous vagrant attempts will have VMs still running, holding onto port 3000. You can also open VirtualBox and see if any VMs are running, and end them. 
+
+If this fails, and something on your host machine is listening to 3000 already, change the host: xxxx port in Vagrantfile to something else unique.
+
+<a name="#box-not-found"></a>
+### Box Not Found
+>"The box 'ubuntu/trusty64' could not be found"
+
+This error is caused by not using the latest version of Vagrant. Somewhere around version 1.5.x, Vagrant started supporting the shorthand box syntax where a URL does not need to be predefined in Vagrantfile. Verify that you are using version 1.7.4 or later with:
+```sh
+$ vagrant -v
+```
+
+If you are using Linux and used a package manager like apt-get to install vagrant, those repositories tend to have older versions of vagrant. Skip the package manager entirely, and go directly to the [vagrant site](https://www.vagrantup.com/) to download the latest version.
+
+<a name="page-not-found"></a>
+### Page Not Found
+
+> Page Not Found (in Browser)
+
+This is when you're not able to pull up your rails app in your browser. You forgot to start the web server, the virtual machine, or both.
+
+```sh
+$ vagrant up
+$ vagrant ssh
+$ rails server
+```
