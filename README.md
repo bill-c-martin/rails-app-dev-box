@@ -17,6 +17,7 @@ Setup a quick virtual machine environment for Ruby on Rails application developm
 	 - [Port Collision](#port-collision)
 	 - [Box Not Found](#box-not-found)
 	 - [Page Not Found](#page-not-found)
+	 - [SSH Binary Not Found](#ssh-binary-not-found)
 
 <a name="overview"></a>
 ## Overview
@@ -198,3 +199,11 @@ $ vagrant up
 $ vagrant ssh
 $ rails server
 ```
+
+<a name="#ssh-binary-not-found"></a>
+### SSH Binary Not Found
+>$ vagrant ssh
+>`ssh` binary could not be found. Is an SSH client installed?
+
+This can happen on certain types of minimal Linux systems that don't ship with an ssh client by default, such as on Arch Linux. The solution is to install one, such as Open SSH. In the case of Arch:
+>$ sudo pacman -S openssh
