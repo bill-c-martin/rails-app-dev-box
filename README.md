@@ -64,8 +64,7 @@ There are two options for setting up the virtual machine.
 #### Option 1) Setup VM Inside an Existing Rails Project
 Copy the Vagrantfile and bootstrap from this repo to your project directory and boot the VM:
 ```sh
-$ cp VagrantFile /path/to/your/existing/rails/project/
-$ cp bootstrap.sh /path/to/your/existing/rails/project/
+$ cp {bootstrap.sh,VagrantFile} /path/to/your/existing/rails/project/
 $ cd /path/to/your/existing/rails/project
 $ vagrant up
 ```
