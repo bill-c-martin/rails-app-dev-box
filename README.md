@@ -50,7 +50,7 @@ Vagrant requires VirtualBox. Git Bash/Extensions is optional, and only needed by
 <a href="initial-setup"></a>
 ### Initial Setup
 ```sh
-$ git clone https://github.com/william-c-martin-iii/rails-app-dev-box.git
+$ git clone https://github.com/bill-c-martin/rails-app-dev-box.git
 $ cd rails-app-dev-box
 $ vagrant up
 ```
